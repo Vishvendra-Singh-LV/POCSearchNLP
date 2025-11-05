@@ -1,8 +1,331 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "AI-Powered Search";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --dark-bg: #0f0f23;
+        --card-bg: rgba(255, 255, 255, 0.1);
+        --glass-border: rgba(255, 255, 255, 0.2);
+        --neon-blue: #00d4ff;
+        --neon-purple: #a855f7;
+    }
+
+    body {
+        background: var(--dark-bg);
+        background-image: 
+            radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+            radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+        min-height: 100vh;
+        color: white;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .futuristic-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+
+    .title-section {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .main-title {
+        font-size: 3.5rem;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 800;
+        margin-bottom: 20px;
+        text-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
+    }
+
+    .subtitle {
+        font-size: 1.3rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 10px;
+    }
+
+    .description {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 1rem;
+    }
+
+    .search-container {
+        background: var(--card-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 40px;
+        margin-bottom: 40px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .search-form {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    .input-group {
+        position: relative;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 20px 25px;
+        font-size: 1.1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid transparent;
+        border-radius: 15px;
+        color: white;
+        outline: none;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+
+    .search-input::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .search-input:focus {
+        border-color: var(--neon-blue);
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    .submit-btn {
+        background: var(--primary-gradient);
+        border: none;
+        padding: 18px 40px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: white;
+        border-radius: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .submit-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .submit-btn:hover::before {
+        left: 100%;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .result-container {
+        background: var(--card-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 30px;
+        margin-top: 30px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .result-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        gap: 15px;
+    }
+
+    .result-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--secondary-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .result-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: var(--neon-blue);
+    }
+
+    .result-content {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+        padding: 20px;
+        border-left: 4px solid var(--neon-purple);
+        white-space: pre-wrap;
+        font-family: 'Courier New', monospace;
+        line-height: 1.6;
+    }
+
+    .error-message {
+        background: rgba(245, 87, 108, 0.2);
+        border: 1px solid rgba(245, 87, 108, 0.5);
+        color: #ff6b6b;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 20px;
+    }
+
+    .loading {
+        display: none;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .loading.show {
+        display: block;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top: 3px solid var(--neon-blue);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 15px;
+    }
+
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .fade-in {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @@media (max-width: 768px) {
+        .main-title {
+            font-size: 2.5rem;
+        }
+        
+        .search-container {
+            padding: 25px;
+        }
+        
+        .search-input {
+            padding: 15px 20px;
+        }
+        
+        .submit-btn {
+            padding: 15px 30px;
+        }
+    }
+</style>
+
+<div class="futuristic-container">
+    <div class="title-section">
+        <h1 class="main-title">AI-Powered Search</h1>
+        <p class="subtitle">Natural Language to SQL Query Engine</p>
+        <p class="description">Ask questions about car parts in plain English and get instant results</p>
+    </div>
+
+    <div class="search-container">
+        <form class="search-form" method="post" action="@Url.Action("Search", "Home")" id="searchForm">
+            <div class="input-group">
+                <input type="text" 
+                       class="search-input" 
+                       name="query" 
+                       placeholder="e.g., 'Show me all brake pads for Toyota Camry 2020' or 'Find parts under $50 for Honda models'"
+                       value="@ViewBag.Query"
+                       required>
+            </div>
+            <button type="submit" class="submit-btn">
+                <span>🚀 Search with AI</span>
+            </button>
+        </form>
+
+        <div class="loading" id="loadingIndicator">
+            <div class="spinner"></div>
+            <p>Processing your query with AI...</p>
+        </div>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="error-message fade-in">
+            <strong>⚠️ Error:</strong> @ViewBag.Error
+        </div>
+    }
+
+    @if (ViewBag.Success == true && ViewBag.Result != null)
+    {
+        <div class="result-container fade-in">
+            <div class="result-header">
+                <div class="result-icon">✨</div>
+                <div class="result-title">AI Analysis Results</div>
+            </div>
+            <div class="result-content">@ViewBag.Result</div>
+        </div>
+    }
 </div>
+
+<script>
+    document.getElementById('searchForm').addEventListener('submit', function() {
+        document.getElementById('loadingIndicator').classList.add('show');
+    });
+
+    // Add floating particles effect
+    function createParticle() {
+        const particle = document.createElement('div');
+        particle.style.cssText = `
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: rgba(0, 212, 255, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+            left: ${Math.random() * 100}vw;
+            top: 100vh;
+            animation: float-up 8s linear forwards;
+        `;
+        
+        document.body.appendChild(particle);
+        
+        setTimeout(() => {
+            particle.remove();
+        }, 8000);
+    }
+
+    // Create floating particles
+    setInterval(createParticle, 2000);
+
+    // Add CSS animation for particles
+    const style = document.createElement('style');
+    style.textContent = `
+        @@keyframes float-up {
+            to {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
