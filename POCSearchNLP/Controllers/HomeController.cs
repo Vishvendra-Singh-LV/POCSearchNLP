@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Npgsql;
 using POCSearchNLP.Models;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -70,45 +71,63 @@ namespace POCSearchNLP.Controllers
         }
 
 		[HttpPost]
-		public async Task<IActionResult> Search(string query)
-		{
-			if (string.IsNullOrWhiteSpace(query))
-			{
-				ViewBag.Error = "Please enter a search query.";
-				return View("Index");
-			}
+        public async Task<IActionResult> Search(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                ViewBag.Error = "Please enter a search query.";
+                return View("Index");
+            }
 
-			try
-			{
-                var (success, result) = await QueryOpenAI(query, HttpContext.RequestAborted);
+            try
+            {
+                var (success, result) = await QueryOpenAI(query,HttpContext.RequestAborted);
+
                 ViewBag.Query = query;
-                ViewBag.Success = success;
-                if (success)
+                ViewBag.Result = result;
+                ViewBag.Success = true;
+
+                // If result is a valid SQL query, execute it
+                if (ViewBag.Success && result.Contains("SELECT"))
                 {
-                    ViewBag.Result = result;
-                }
-                else
-                {
-                    ViewBag.Error = result;
+                    
+                    var dbResults = await ExecuteSqlQueryAsync(result);
+                    ViewBag.DbResults = dbResults;
                 }
             }
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "Error processing search query: {Query}", query);
-				ViewBag.Error = "An error occurred while processing your query. Please try again.";
-			}
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing search query: {Query}", query);
+                ViewBag.Error = "An error occurred while processing your query. Please try again.";
+            }
 
-			return View("Index");
-		}
+            return View("Index");
+        }
 
-		private async Task<string> ProcessNaturalLanguageQuery(string query)
-		{
-			// Placeholder for your NLP processing logic
-			// Replace this with your Azure OpenAI integration
-			await Task.Delay(1000); // Simulate processing time
+        // Execute SQL query against PostgreSQL
+        private async Task<List<Dictionary<string, object>>> ExecuteSqlQueryAsync(string sql)
+        {
+            var results = new List<Dictionary<string, object>>();
+            var connStr = _configuration.GetConnectionString("DefaultConnection");
 
-			return $"Processed query: '{query}'\n\nGenerated SQL: SELECT * FROM PartsInfo WHERE PartName LIKE '%{query}%'\n\nResults: Found 5 matching parts.";
-		}
+            await using var conn = new NpgsqlConnection(connStr);
+            await conn.OpenAsync();
+
+            await using var cmd = new NpgsqlCommand(sql, conn);
+            await using var reader = await cmd.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                var row = new Dictionary<string, object>();
+                for (int i = 0; i < reader.FieldCount; i++)
+                {
+                    row[reader.GetName(i)] = reader.GetValue(i);
+                }
+                results.Add(row);
+            }
+
+            return results;
+        }
 
         public IActionResult Privacy()
         {

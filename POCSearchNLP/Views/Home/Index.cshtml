@@ -284,6 +284,9 @@
         </div>
     }
 </div>
+    <H1>
+    @Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.DbResults)
+    </H1>
 
 <script>
     document.getElementById('searchForm').addEventListener('submit', function() {
