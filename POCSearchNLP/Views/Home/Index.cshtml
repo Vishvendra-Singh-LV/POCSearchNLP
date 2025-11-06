@@ -73,10 +73,13 @@
 
     .input-group {
         position: relative;
+        display: flex;
+        gap: 10px;
+        align-items: center;
     }
 
     .search-input {
-        width: 100%;
+        flex: 1;
         padding: 20px 25px;
         font-size: 1.1rem;
         background: rgba(255, 255, 255, 0.1);
@@ -97,6 +100,110 @@
             box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
             background: rgba(255, 255, 255, 0.15);
         }
+
+    .voice-btn, .clear-btn {
+        padding: 20px;
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 1.2rem;
+        backdrop-filter: blur(10px);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .voice-btn {
+        background: rgba(0, 212, 255, 0.2);
+        border: 2px solid var(--neon-blue);
+        color: var(--neon-blue);
+    }
+
+        .voice-btn:hover {
+            background: rgba(0, 212, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .voice-btn.listening {
+            background: rgba(46, 213, 115, 0.3);
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+            animation: pulse 1.5s infinite;
+        }
+
+    .clear-btn {
+        background: rgba(255, 71, 87, 0.2);
+        border: 2px solid var(--neon-red);
+        color: var(--neon-red);
+    }
+
+        .clear-btn:hover {
+            background: rgba(255, 71, 87, 0.3);
+            box-shadow: 0 0 20px rgba(255, 71, 87, 0.4);
+            transform: translateY(-2px);
+        }
+
+    @@keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+            box-shadow: 0 0 20px rgba(46, 213, 115, 0.4);
+        }
+
+        50% {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(46, 213, 115, 0.6);
+        }
+    }
+
+    .speech-display {
+        background: rgba(0, 0, 0, 0.4);
+        border: 2px solid var(--neon-purple);
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+        min-height: 60px;
+        display: none;
+        backdrop-filter: blur(10px);
+    }
+
+        .speech-display.active {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .speech-display h4 {
+            margin: 0 0 10px 0;
+            color: var(--neon-purple);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+    .speech-text {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1.1rem;
+        line-height: 1.4;
+        min-height: 30px;
+    }
+
+    .speech-interim {
+        opacity: 0.6;
+        font-style: italic;
+    }
+
+    @@keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 
     .submit-btn {
         background: var(--primary-gradient);
@@ -145,48 +252,24 @@
     .result-header {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        margin-bottom: 25px;
-        flex-wrap: wrap;
-        gap: 15px;
-    }
-
-    .result-title-section {
-        display: flex;
-        align-items: center;
+        margin-bottom: 20px;
         gap: 15px;
     }
 
     .result-icon {
-        width: 32px;
-        height: 32px;
+        width: 24px;
+        height: 24px;
         border-radius: 50%;
         background: var(--secondary-gradient);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.2rem;
     }
 
     .result-title {
         font-size: 1.4rem;
         font-weight: 600;
         color: var(--neon-blue);
-    }
-
-    .result-stats {
-        display: flex;
-        gap: 15px;
-        font-size: 0.9rem;
-        color: rgba(255, 255, 255, 0.7);
-        flex-wrap: wrap;
-    }
-
-    .stat-item {
-        background: rgba(255, 255, 255, 0.1);
-        padding: 5px 12px;
-        border-radius: 15px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .result-content {
@@ -197,8 +280,121 @@
         white-space: pre-wrap;
         font-family: 'Courier New', monospace;
         line-height: 1.6;
-        margin-bottom: 25px;
     }
+
+    .error-message {
+        background: rgba(245, 87, 108, 0.2);
+        border: 1px solid rgba(245, 87, 108, 0.5);
+        color: #ff6b6b;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 20px;
+    }
+
+    .loading {
+        display: none;
+        text-align: center;
+        padding: 20px;
+    }
+
+        .loading.show {
+            display: block;
+        }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top: 3px solid var(--neon-blue);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 15px;
+    }
+
+    .voice-status {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+        text-align: center;
+        margin-top: 10px;
+        display: none;
+    }
+
+        .voice-status.show {
+            display: block;
+        }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .fade-in {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .language-selector {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        font-size: 0.95rem;
+    }
+
+    .language-label {
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .language-dropdown {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        color: white;
+        padding: 10px 15px;
+        font-size: 0.95rem;
+        outline: none;
+        backdrop-filter: blur(10px);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 180px;
+    }
+
+        .language-dropdown:hover {
+            border-color: var(--neon-blue);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .language-dropdown:focus {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .language-dropdown option {
+            background: #1a1a2e;
+            color: white;
+            padding: 8px;
+        }
 
     /* Dynamic Table Styles */
     .data-table-container {
@@ -303,61 +499,6 @@
         font-style: italic;
     }
 
-    .error-message {
-        background: rgba(245, 87, 108, 0.2);
-        border: 1px solid rgba(245, 87, 108, 0.5);
-        color: #ff6b6b;
-        padding: 15px;
-        border-radius: 10px;
-        margin-top: 20px;
-    }
-
-    .loading {
-        display: none;
-        text-align: center;
-        padding: 20px;
-    }
-
-        .loading.show {
-            display: block;
-        }
-
-    .spinner {
-        width: 40px;
-        height: 40px;
-        border: 3px solid rgba(255, 255, 255, 0.3);
-        border-top: 3px solid var(--neon-blue);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 15px;
-    }
-
-    @@keyframes spin {
-        0% {
-            transform: rotate(0deg);
-        }
-
-        100% {
-            transform: rotate(360deg);
-        }
-    }
-
-    .fade-in {
-        animation: fadeIn 0.5s ease-in;
-    }
-
-    @@keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
     @@media (max-width: 768px) {
         .main-title {
             font-size: 2.5rem;
@@ -373,6 +514,16 @@
 
         .submit-btn {
             padding: 15px 30px;
+        }
+
+        .input-group {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .voice-btn, .clear-btn {
+            width: 100%;
+            padding: 15px;
         }
 
         .result-header {
@@ -410,14 +561,45 @@
 
     <div class="search-container">
         <form class="search-form" method="post" action="@Url.Action("Search", "Home")" id="searchForm">
+            <div class="language-selector">
+                <label class="language-label" for="languageSelect">
+                    🌐 Voice Language:
+                </label>
+                <select id="languageSelect" class="language-dropdown">
+                    <option value="en-IN" selected>🇮🇳 English (India)</option>
+                    <option value="en-US">🇺🇸 English (US)</option>
+                    <option value="fr-FR">🇫🇷 Français (French)</option>
+                    <option value="hi-IN">🇮🇳 हिंदी (Hindi)</option>
+                </select>
+            </div>
             <div class="input-group">
                 <input type="text"
                        class="search-input"
                        name="query"
+                       id="searchInput"
                        placeholder="e.g., 'Show me all brake pads for Toyota Camry 2020' or 'Find parts under $50 for Honda models'"
                        value="@ViewBag.Query"
                        required>
+				
+                <button type="button" class="voice-btn" id="voiceBtn" title="Start Voice Search">
+                    🎤
+                </button>
+                <button type="button" class="clear-btn" id="clearBtn" title="Clear Text">
+                    🗑️
+                </button>
             </div>
+
+            <div class="speech-display" id="speechDisplay">
+                <h4>
+                    <span id="listeningIndicator">🎙️ Listening...</span>
+                </h4>
+                <div class="speech-text" id="speechText"></div>
+            </div>
+
+            <div class="voice-status" id="voiceStatus">
+                Click the microphone to start voice search
+            </div>
+
             <button type="submit" class="submit-btn">
                 <span>🚀 Search with AI</span>
             </button>
@@ -511,8 +693,274 @@
 </div>
 
 <script>
-    document.getElementById('searchForm').addEventListener('submit', function() {
-        document.getElementById('loadingIndicator').classList.add('show');
+    class VoiceSearch {
+        constructor() {
+            this.recognition = null;
+            this.isListening = false;
+            this.finalTranscript = '';
+            this.interimTranscript = '';
+            this.currentLanguage = 'en-IN'; // Default to English India
+
+            // Language display names
+            this.languageNames = {
+                'en-IN': 'English (India)',
+                'en-US': 'English (US)',
+                'fr-FR': 'Français (French)',
+                'hi-IN': 'हिंदी (Hindi)'
+            };
+
+            this.voiceBtn = document.getElementById('voiceBtn');
+            this.clearBtn = document.getElementById('clearBtn');
+            this.searchInput = document.getElementById('searchInput');
+            this.speechDisplay = document.getElementById('speechDisplay');
+            this.speechText = document.getElementById('speechText');
+            this.voiceStatus = document.getElementById('voiceStatus');
+            this.listeningIndicator = document.getElementById('listeningIndicator');
+            this.languageSelect = document.getElementById('languageSelect');
+
+            this.initVoiceRecognition();
+            this.bindEvents();
+        }
+
+        initVoiceRecognition() {
+            // Check for browser support
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                this.showError('Voice recognition not supported in this browser. Please use Chrome, Edge, or Safari.');
+                this.voiceBtn.style.display = 'none';
+                return;
+            }
+
+            // Initialize Speech Recognition
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            this.recognition = new SpeechRecognition();
+
+            // Configure recognition settings
+            this.recognition.continuous = true;
+            this.recognition.interimResults = true;
+            this.recognition.lang = this.currentLanguage;
+            this.recognition.maxAlternatives = 1;
+
+            console.log('Voice recognition initialized with language:', this.recognition.lang);
+
+            // Event handlers
+            this.recognition.onstart = () => {
+                this.onSpeechStart();
+            };
+
+            this.recognition.onresult = (event) => {
+                this.onSpeechResult(event);
+            };
+
+            this.recognition.onerror = (event) => {
+                this.onSpeechError(event);
+            };
+
+            this.recognition.onend = () => {
+                this.onSpeechEnd();
+            };
+        }
+
+        bindEvents() {
+            this.voiceBtn.addEventListener('click', () => {
+                if (this.isListening) {
+                    this.stopListening();
+                } else {
+                    this.startListening();
+                }
+            });
+
+            this.clearBtn.addEventListener('click', () => {
+                this.clearInput();
+            });
+
+            // Language dropdown change event
+            this.languageSelect.addEventListener('change', (e) => {
+                this.changeLanguage(e.target.value);
+            });
+        }
+
+        changeLanguage(newLanguage) {
+            // Stop current listening if active
+            if (this.isListening) {
+                this.stopListening();
+            }
+
+            // Update current language
+            this.currentLanguage = newLanguage;
+
+            // Reinitialize speech recognition with new language
+            this.initVoiceRecognition();
+
+            // Show language change confirmation
+            this.voiceStatus.textContent = `Language changed to ${this.languageNames[newLanguage]}`;
+            this.voiceStatus.classList.add('show');
+            this.voiceStatus.style.color = 'var(--neon-green)';
+
+            setTimeout(() => {
+                this.voiceStatus.classList.remove('show');
+                this.voiceStatus.style.color = 'rgba(255, 255, 255, 0.7)';
+            }, 2500);
+
+            console.log('Language changed to:', newLanguage);
+        }
+
+        startListening() {
+            if (!this.recognition) return;
+
+            try {
+                this.finalTranscript = '';
+                this.interimTranscript = '';
+                this.isListening = true;
+
+                // Ensure language is set before starting
+                this.recognition.lang = this.currentLanguage;
+
+                this.voiceBtn.classList.add('listening');
+                this.voiceBtn.innerHTML = '⏹️';
+                this.voiceBtn.title = 'Stop Voice Search';
+
+                this.speechDisplay.classList.add('active');
+                this.voiceStatus.classList.add('show');
+                this.voiceStatus.textContent = `Listening in ${this.languageNames[this.currentLanguage]}... Speak now!`;
+
+                this.recognition.start();
+
+            } catch (error) {
+                this.showError('Could not start voice recognition: ' + error.message);
+                this.resetVoiceUI();
+            }
+        }
+
+        stopListening() {
+            if (!this.recognition || !this.isListening) return;
+
+            this.recognition.stop();
+            this.isListening = false;
+        }
+
+        onSpeechStart() {
+            this.listeningIndicator.textContent = `🎙️ Listening in ${this.languageNames[this.currentLanguage]}...`;
+            this.speechText.textContent = '';
+        }
+
+        onSpeechResult(event) {
+            let interimTranscript = '';
+            let finalTranscript = '';
+
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const transcript = event.results[i][0].transcript;
+
+                if (event.results[i].isFinal) {
+                    finalTranscript += transcript + ' ';
+                } else {
+                    interimTranscript += transcript;
+                }
+            }
+
+            this.finalTranscript += finalTranscript;
+            this.interimTranscript = interimTranscript;
+
+            // Display the speech text
+            const displayText = this.finalTranscript +
+                (this.interimTranscript ? `<span class="speech-interim">${this.interimTranscript}</span>` : '');
+
+            this.speechText.innerHTML = displayText || 'Speak your search query...';
+        }
+
+        onSpeechError(event) {
+            let errorMessage = 'Speech recognition error: ';
+
+            switch (event.error) {
+                case 'network':
+                    errorMessage += 'Network error occurred';
+                    break;
+                case 'audio-capture':
+                    errorMessage += 'Microphone not accessible';
+                    break;
+                case 'not-allowed':
+                    errorMessage += 'Microphone access denied';
+                    break;
+                case 'no-speech':
+                    errorMessage += 'No speech detected';
+                    break;
+                case 'language-not-supported':
+                    errorMessage += `Language ${this.currentLanguage} not supported`;
+                    break;
+                default:
+                    errorMessage += event.error;
+            }
+
+            this.showError(errorMessage);
+            this.resetVoiceUI();
+        }
+
+        onSpeechEnd() {
+            this.isListening = false;
+
+            // Fill the search input with the final transcript
+            if (this.finalTranscript.trim()) {
+                this.searchInput.value = this.finalTranscript.trim();
+                this.voiceStatus.textContent = 'Speech captured! You can edit the text or search now.';
+
+                // Auto-hide speech display after a delay
+                setTimeout(() => {
+                    this.speechDisplay.classList.remove('active');
+                    this.voiceStatus.classList.remove('show');
+                }, 3000);
+            } else {
+                this.voiceStatus.textContent = 'No speech detected. Try again.';
+                setTimeout(() => {
+                    this.speechDisplay.classList.remove('active');
+                    this.voiceStatus.classList.remove('show');
+                }, 2000);
+            }
+
+            this.resetVoiceButton();
+        }
+
+        resetVoiceButton() {
+            this.voiceBtn.classList.remove('listening');
+            this.voiceBtn.innerHTML = '🎤';
+            this.voiceBtn.title = 'Start Voice Search';
+        }
+
+        resetVoiceUI() {
+            this.resetVoiceButton();
+            this.isListening = false;
+            this.speechDisplay.classList.remove('active');
+            this.voiceStatus.classList.remove('show');
+        }
+
+        clearInput() {
+            this.searchInput.value = '';
+            this.finalTranscript = '';
+            this.interimTranscript = '';
+            this.speechText.textContent = '';
+            this.speechDisplay.classList.remove('active');
+            this.voiceStatus.classList.remove('show');
+            this.searchInput.focus();
+        }
+
+        showError(message) {
+            this.voiceStatus.textContent = message;
+            this.voiceStatus.classList.add('show');
+            this.voiceStatus.style.color = 'var(--neon-red)';
+
+            setTimeout(() => {
+                this.voiceStatus.classList.remove('show');
+                this.voiceStatus.style.color = 'rgba(255, 255, 255, 0.7)';
+            }, 4000);
+        }
+    }
+
+    // Initialize voice search when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        const voiceSearch = new VoiceSearch();
+
+        // Existing form submission handler
+        document.getElementById('searchForm').addEventListener('submit', function() {
+            document.getElementById('loadingIndicator').classList.add('show');
+        });
     });
 
     // Add floating particles effect
