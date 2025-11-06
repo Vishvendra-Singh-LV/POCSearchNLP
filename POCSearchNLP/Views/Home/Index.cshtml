@@ -458,13 +458,6 @@
                         <div class="result-icon">📊</div>
                         <div class="result-title">Query Results</div>
                     </div>
-                    @if (results != null && results.Any())
-                    {
-                        <div class="result-stats">
-                            <span class="stat-item">📝 @results.Count @(results.Count == 1 ? "row" : "rows")</span>
-                            <span class="stat-item">📋 @results.First().Keys.Count @(results.First().Keys.Count == 1 ? "column" : "columns")</span>
-                        </div>
-                    }
                 </div>
 
                 <div class="data-table-container">
@@ -558,30 +551,44 @@
 
     private string FormatColumnHeader(string columnName)
     {
-        if (string.IsNullOrEmpty(columnName))
-            return columnName;
+        if (string.IsNullOrWhiteSpace(columnName))
+            return string.Empty;
 
-        // Split camelCase and PascalCase words
-        var result = System.Text.RegularExpressions.Regex.Replace(columnName, "([a-z])([A-Z])", "$1 $2");
+        var result = columnName.Trim();
 
-
-
-        // Split by common separators
-
+        // Handle common separators
         result = result.Replace("_", " ").Replace("-", " ");
 
-        // Capitalize first letter of each word
+        // Insert spaces before capital letters, but keep acronyms intact
+        // Examples:
+        // "OemName" -> "Oem Name"
+        // "OEMName" -> "OEM Name"
+        // "EquipmentModels" -> "Equipment Models"
+        result = System.Text.RegularExpressions.Regex.Replace(result,
+            "(?<!^)(?=[A-Z][a-z])", " "); // space before capital letter followed by lowercase
+
+        // Handle cases like "IDNumber" -> "ID Number"
+        result = System.Text.RegularExpressions.Regex.Replace(result,
+            "(?<=[a-z])(?=[A-Z])", " ");
+
+        // Handle multiple spaces
+        result = System.Text.RegularExpressions.Regex.Replace(result, @"\s+", " ");
+
+        // Split into words and capitalize properly
         var words = result.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         for (int i = 0; i < words.Length; i++)
         {
-            if (words[i].Length > 0)
+            if (words[i].Length > 1 && words[i].All(char.IsUpper))
             {
-                words[i] = char.ToUpper(words[i][0]) + (words[i].Length > 1 ? words[i].Substring(1).ToLower() : "");
+                // Keep acronyms (like OEM, ID) in uppercase
+                continue;
             }
+            words[i] = char.ToUpper(words[i][0]) + words[i].Substring(1).ToLower();
         }
 
         return string.Join(" ", words);
     }
+
 
     private string GetCellClass(object value)
     {
