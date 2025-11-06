@@ -15,35 +15,41 @@ namespace POCSearchNLP.Controllers
         // Database schema used for text-to-SQL generation.
         // SQL Server style (IDENTITY, NVARCHAR, DECIMAL). Adjust dialect if targeting PostgreSQL.
         private const string _vehicleSchema = """
-    CREATE TABLE Make (
-        MakeID INT IDENTITY(1,1) PRIMARY KEY,
-        Name NVARCHAR(100) NOT NULL UNIQUE
-    );
+        CREATE SCHEMA IF NOT EXISTS dbo;
+        SET search_path TO dbo;
 
-    CREATE TABLE Model (
-        ModelID INT IDENTITY(1,1) PRIMARY KEY,
-        MakeID INT NOT NULL,
-        Name NVARCHAR(100) NOT NULL,
-        YearFrom SMALLINT NULL,
-        YearTo SMALLINT NULL,
-        BodyStyle NVARCHAR(50) NULL,
-        CONSTRAINT FK_Model_Make FOREIGN KEY (MakeID)
-            REFERENCES Make (MakeID),
-        CONSTRAINT UQ_Model UNIQUE (MakeID, Name, YearFrom, YearTo)
-    );
+        CREATE TABLE dbo.Oem (
+            OemID SERIAL PRIMARY KEY,
+            Name VARCHAR(100) NOT NULL UNIQUE
+        );
 
-    CREATE TABLE PartsInfo (
-        PartID INT IDENTITY(1,1) PRIMARY KEY,
-        ModelID INT NOT NULL,
-        PartNumber NVARCHAR(50) NOT NULL,
-        PartName NVARCHAR(100) NOT NULL,
-        Description NVARCHAR(500) NULL,
-        Category NVARCHAR(50) NULL,
-        Price DECIMAL(10,2) NULL,
-        CONSTRAINT FK_PartsInfo_Model FOREIGN KEY (ModelID)
-            REFERENCES Model (ModelID),
-        CONSTRAINT UQ_PartsInfo UNIQUE (ModelID, PartNumber)
-    );
+        CREATE TABLE dbo.EquipmentModel (
+            ModelID SERIAL PRIMARY KEY,
+            OemID INT NOT NULL,
+            ModelName VARCHAR(120) NOT NULL,
+            Category VARCHAR(50),
+            EngineBrand VARCHAR(50),
+            EngineModel VARCHAR(60),
+            DeckSizeInch SMALLINT,
+            YearFrom SMALLINT,
+            YearTo SMALLINT,
+            CONSTRAINT FK_EquipmentModel_Oem FOREIGN KEY (OemID)
+                REFERENCES dbo.Oem (OemID)
+        );
+
+        CREATE TABLE dbo.Part (
+            PartID SERIAL PRIMARY KEY,
+            ModelID INT NOT NULL,
+            PartNumber VARCHAR(50) NOT NULL,
+            PartName VARCHAR(120) NOT NULL,
+            Category VARCHAR(50),
+            Description TEXT,
+            IsPremium BOOLEAN,
+            PriceUSD DECIMAL(10,2),
+            OemUrl TEXT,
+            CONSTRAINT FK_Part_Model FOREIGN KEY (ModelID)
+                REFERENCES dbo.EquipmentModel (ModelID)
+        );
     """;
 
         public HomeController(
