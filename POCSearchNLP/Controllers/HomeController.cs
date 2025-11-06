@@ -2,7 +2,9 @@ using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using POCSearchNLP.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace POCSearchNLP.Controllers
 {
@@ -78,14 +80,18 @@ namespace POCSearchNLP.Controllers
 
 			try
 			{
-				// TODO: Implement your NLP logic here
-				// This is where you'll integrate with Azure OpenAI
-				var result = await ProcessNaturalLanguageQuery(query);
-
-				ViewBag.Query = query;
-				ViewBag.Result = result;
-				ViewBag.Success = true;
-			}
+                var (success, result) = await QueryOpenAI(query, HttpContext.RequestAborted);
+                ViewBag.Query = query;
+                ViewBag.Success = success;
+                if (success)
+                {
+                    ViewBag.Result = result;
+                }
+                else
+                {
+                    ViewBag.Error = result;
+                }
+            }
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, "Error processing search query: {Query}", query);
@@ -116,17 +122,11 @@ namespace POCSearchNLP.Controllers
         }
 	
 
-        // POST: /Home/QueryOpenAI
-        [HttpPost]
-        public async Task<IActionResult> QueryOpenAI([FromForm] string prompt, CancellationToken cancellationToken)
+        private async Task<(bool, string)> QueryOpenAI([FromForm] string input, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(prompt))
-                return BadRequest(new { error = "Prompt is required." });
-
+            string result;
             var apiKey = _configuration["OpenAI:ApiKey"];
-            if (string.IsNullOrWhiteSpace(apiKey))
-                return StatusCode(500, new { error = "OpenAI API key not configured. Set OpenAI:ApiKey in appsettings or user secrets." });
-
+            
             var systemInstruction =
                 $"You are a text to SQL converter. Use the following database schema (SQL Server dialect) to generate a query from the user prompt. Return only SQL, no explanation.\n\n{_vehicleSchema}";
 
@@ -136,13 +136,13 @@ namespace POCSearchNLP.Controllers
                 messages = new[]
                 {
                         new { role = "system", content = systemInstruction },
-                        new { role = "user", content = prompt }
+                        new { role = "user", content = input }
                     },
             };
 
             using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/chat/completions")
             {
-                Content = new StringContent(JsonSerializer.Serialize(requestPayload), Encoding.UTF8, "application/json")
+                Content = new StringContent(System.Text.Json.JsonSerializer.Serialize(requestPayload), Encoding.UTF8, "application/json")
             };
             httpRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
 
@@ -154,40 +154,38 @@ namespace POCSearchNLP.Controllers
                 if (!response.IsSuccessStatusCode)
                 {
                     _logger.LogWarning("OpenAI API error {Status}: {Body}", response.StatusCode, raw);
-                    return StatusCode((int)response.StatusCode, new { error = "OpenAI API call failed.", details = raw });
+                    result = "OpenAI API call failed. " + raw;
+                    return (false, result);
                 }
 
-                string? answer = null;
                 try
                 {
                     using var doc = JsonDocument.Parse(raw);
-                    answer = doc.RootElement
+                    result = doc.RootElement
                         .GetProperty("choices")[0]
                         .GetProperty("message")
                         .GetProperty("content")
-                        .GetString();
+                        .GetString() ?? "";
                 }
                 catch (Exception exParse)
                 {
                     _logger.LogError(exParse, "Failed to parse OpenAI response.");
-                    return StatusCode(500, new { error = "Failed to parse OpenAI response.", raw });
+                    result = "Failed to parse OpenAI response." + raw;
+                    return (false, result);
                 }
 
-                return Json(new
-                {
-                    prompt,
-                    reply = answer,
-                    model = requestPayload.model
-                });
+                return (true, result);
             }
             catch (OperationCanceledException)
             {
-                return StatusCode(499, new { error = "Request cancelled." });
+                result = "Request cancelled.";
+                return (false, result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error calling OpenAI.");
-                return StatusCode(500, new { error = "Unexpected server error." });
+                result = "Unexpected server error";
+                return (false, result);
             }
         }
     }
