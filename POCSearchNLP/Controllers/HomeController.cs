@@ -69,8 +69,12 @@ namespace POCSearchNLP.Controllers
         {
             return View();
         }
+        public IActionResult Index2()
+        {
+            return View();
+        }
 
-		[HttpPost]
+        [HttpPost]
         public async Task<IActionResult> Search(string query)
         {
             if (string.IsNullOrWhiteSpace(query))
@@ -102,6 +106,40 @@ namespace POCSearchNLP.Controllers
             }
 
             return View("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Search2(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                ViewBag.Error = "Please enter a search query.";
+                return View("Index");
+            }
+
+            try
+            {
+                var (success, result) = await QueryOpenAI(query, HttpContext.RequestAborted);
+
+                ViewBag.Query = query;
+                ViewBag.Result = result;
+                ViewBag.Success = true;
+
+                // If result is a valid SQL query, execute it
+                if (ViewBag.Success && result.Contains("SELECT"))
+                {
+
+                    var dbResults = await ExecuteSqlQueryAsync(result);
+                    ViewBag.DbResults = dbResults;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing search query: {Query}", query);
+                ViewBag.Error = "An error occurred while processing your query. Please try again.";
+            }
+
+            return View("Index2");
         }
 
         // Execute SQL query against PostgreSQL
