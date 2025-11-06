@@ -65,10 +65,14 @@ namespace POCSearchNLP.Controllers
 			_httpClient = httpClientFactory.CreateClient();
 		}
 
-		public IActionResult Index()
-		{
-			return View();
-		}
+        public IActionResult Index()
+        {
+            return View();
+        }
+        public IActionResult Index2()
+        {
+            return View();
+        }
 
 		[HttpPost]
 		public async Task<IActionResult> Search(string query)
@@ -104,11 +108,45 @@ namespace POCSearchNLP.Controllers
 			return View("Index");
 		}
 
-		// Execute SQL query against PostgreSQL
-		private async Task<List<Dictionary<string, object>>> ExecuteSqlQueryAsync(string sql)
-		{
-			var results = new List<Dictionary<string, object>>();
-			var connStr = _configuration.GetConnectionString("DefaultConnection");
+        [HttpPost]
+        public async Task<IActionResult> Search2(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                ViewBag.Error = "Please enter a search query.";
+                return View("Index");
+            }
+
+            try
+            {
+                var (success, result) = await QueryOpenAI(query, HttpContext.RequestAborted);
+
+                ViewBag.Query = query;
+                ViewBag.Result = result;
+                ViewBag.Success = true;
+
+                // If result is a valid SQL query, execute it
+                if (ViewBag.Success && result.Contains("SELECT"))
+                {
+
+                    var dbResults = await ExecuteSqlQueryAsync(result);
+                    ViewBag.DbResults = dbResults;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing search query: {Query}", query);
+                ViewBag.Error = "An error occurred while processing your query. Please try again.";
+            }
+
+            return View("Index2");
+        }
+
+        // Execute SQL query against PostgreSQL
+        private async Task<List<Dictionary<string, object>>> ExecuteSqlQueryAsync(string sql)
+        {
+            var results = new List<Dictionary<string, object>>();
+            var connStr = _configuration.GetConnectionString("DefaultConnection");
 
 			await using var conn = new NpgsqlConnection(connStr);
 			await conn.OpenAsync();
