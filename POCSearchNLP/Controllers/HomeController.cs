@@ -168,7 +168,7 @@ namespace POCSearchNLP.Controllers
 			var apiKey = _configuration["OpenAI:ApiKey"];
 
 			var systemInstruction =
-				$"You are a text to SQL converter. Use the following database schema (SQL Server dialect) to generate a query from the user prompt. Return only SQL, no explanation.\n\n{_vehicleSchema}";
+				$"You are a text to PostgreSQl converter. Use the following database schema (SQL Server dialect) to generate a query from the user prompt. Return only SQL, no explanation.\n\n{_vehicleSchema}";
 
 			var requestPayload = new
 			{
