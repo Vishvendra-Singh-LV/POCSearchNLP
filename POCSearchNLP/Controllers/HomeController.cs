@@ -205,10 +205,11 @@ namespace POCSearchNLP.Controllers
 			string result;
 			var apiKey = _configuration["OpenAI:ApiKey"];
 
-			var systemInstruction =
-				$"You are a text to PostgreSQl converter. Use the following database schema (SQL Server dialect) to generate a query from the user prompt. Return only SQL, no explanation.\n\n{_vehicleSchema}";
+            var systemInstruction =$"You are a text to PostgreSQL converter. Use the following database schema (SQL Server dialect) to generate a query from the user prompt. " +
+									"When converting, replace 'dbo.' with nothing (PostgreSQL default schema). Return only SQL, no explanation.\n\n" + _vehicleSchema;
 
-			var requestPayload = new
+
+            var requestPayload = new
 			{
 				model = "gpt-5-nano",
 				messages = new[]
