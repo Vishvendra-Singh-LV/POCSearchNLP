@@ -11,21 +11,19 @@
         --glass-border: rgba(255, 255, 255, 0.2);
         --neon-blue: #00d4ff;
         --neon-purple: #a855f7;
+        --neon-green: #10b981;
     }
 
     body {
         background: var(--dark-bg);
-        background-image: 
-            radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
-            radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+        background-image: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%), radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
         min-height: 100vh;
         color: white;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     .futuristic-container {
-        max-width: 900px;
+        max-width: 1200px;
         margin: 0 auto;
         padding: 40px 20px;
     }
@@ -90,15 +88,15 @@
         backdrop-filter: blur(10px);
     }
 
-    .search-input::placeholder {
-        color: rgba(255, 255, 255, 0.5);
-    }
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
 
-    .search-input:focus {
-        border-color: var(--neon-blue);
-        box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
-        background: rgba(255, 255, 255, 0.15);
-    }
+        .search-input:focus {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
 
     .submit-btn {
         background: var(--primary-gradient);
@@ -114,25 +112,25 @@
         overflow: hidden;
     }
 
-    .submit-btn::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        transition: left 0.5s;
-    }
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
 
-    .submit-btn:hover::before {
-        left: 100%;
-    }
+        .submit-btn:hover::before {
+            left: 100%;
+        }
 
-    .submit-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-    }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
 
     .result-container {
         background: var(--card-bg);
@@ -147,24 +145,48 @@
     .result-header {
         display: flex;
         align-items: center;
-        margin-bottom: 20px;
+        justify-content: space-between;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .result-title-section {
+        display: flex;
+        align-items: center;
         gap: 15px;
     }
 
     .result-icon {
-        width: 24px;
-        height: 24px;
+        width: 32px;
+        height: 32px;
         border-radius: 50%;
         background: var(--secondary-gradient);
         display: flex;
         align-items: center;
         justify-content: center;
+        font-size: 1.2rem;
     }
 
     .result-title {
         font-size: 1.4rem;
         font-weight: 600;
         color: var(--neon-blue);
+    }
+
+    .result-stats {
+        display: flex;
+        gap: 15px;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+        flex-wrap: wrap;
+    }
+
+    .stat-item {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 5px 12px;
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .result-content {
@@ -175,6 +197,110 @@
         white-space: pre-wrap;
         font-family: 'Courier New', monospace;
         line-height: 1.6;
+        margin-bottom: 25px;
+    }
+
+    /* Dynamic Table Styles */
+    .data-table-container {
+        overflow-x: auto;
+        border-radius: 15px;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--glass-border);
+        max-height: 600px;
+        overflow-y: auto;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+        min-width: 600px;
+    }
+
+        .data-table th {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--neon-blue);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            text-transform: capitalize;
+        }
+
+            .data-table th:first-child {
+                border-top-left-radius: 15px;
+            }
+
+            .data-table th:last-child {
+                border-top-right-radius: 15px;
+            }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+            transition: background-color 0.3s ease;
+            vertical-align: top;
+            word-wrap: break-word;
+            max-width: 300px;
+        }
+
+        .data-table tr:hover td {
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .data-table tr:nth-child(even) td {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .data-table tr:nth-child(even):hover td {
+            background: rgba(0, 212, 255, 0.15);
+        }
+
+    /* Smart column styling based on data type */
+    .numeric-cell {
+        text-align: right;
+        color: var(--neon-green);
+        font-family: 'Courier New', monospace;
+    }
+
+    .url-cell {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+        .url-cell a {
+            color: var(--neon-blue);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+            .url-cell a:hover {
+                color: var(--neon-purple);
+                text-decoration: underline;
+            }
+
+    .boolean-cell {
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .null-cell {
+        color: rgba(255, 255, 255, 0.4);
+        font-style: italic;
+        text-align: center;
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 40px;
+        color: rgba(255, 255, 255, 0.6);
+        font-style: italic;
     }
 
     .error-message {
@@ -192,9 +318,9 @@
         padding: 20px;
     }
 
-    .loading.show {
-        display: block;
-    }
+        .loading.show {
+            display: block;
+        }
 
     .spinner {
         width: 40px;
@@ -207,8 +333,13 @@
     }
 
     @@keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
     }
 
     .fade-in {
@@ -216,25 +347,56 @@
     }
 
     @@keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     @@media (max-width: 768px) {
         .main-title {
             font-size: 2.5rem;
         }
-        
+
         .search-container {
             padding: 25px;
         }
-        
+
         .search-input {
             padding: 15px 20px;
         }
-        
+
         .submit-btn {
             padding: 15px 30px;
+        }
+
+        .result-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .result-stats {
+            width: 100%;
+        }
+
+        .data-table {
+            font-size: 0.8rem;
+            min-width: 500px;
+        }
+
+            .data-table th,
+            .data-table td {
+                padding: 8px 6px;
+            }
+
+        .futuristic-container {
+            max-width: 100%;
+            padding: 20px 10px;
         }
     }
 </style>
@@ -249,9 +411,9 @@
     <div class="search-container">
         <form class="search-form" method="post" action="@Url.Action("Search", "Home")" id="searchForm">
             <div class="input-group">
-                <input type="text" 
-                       class="search-input" 
-                       name="query" 
+                <input type="text"
+                       class="search-input"
+                       name="query"
                        placeholder="e.g., 'Show me all brake pads for Toyota Camry 2020' or 'Find parts under $50 for Honda models'"
                        value="@ViewBag.Query"
                        required>
@@ -273,20 +435,80 @@
             <strong>⚠️ Error:</strong> @ViewBag.Error
         </div>
     }
+
     @if (ViewBag.Success == true && ViewBag.Result != null)
     {
         <div class="result-container fade-in">
             <div class="result-header">
-                <div class="result-icon">✨</div>
-                <div class="result-title">AI Analysis Results</div>
+                <div class="result-title-section">
+                    <div class="result-icon">🤖</div>
+                    <div class="result-title">Generated SQL Query</div>
+                </div>
             </div>
             <div class="result-content">@ViewBag.Result</div>
+
+            @if (ViewBag.DbResults != null)
+            {
+
+                var results = ViewBag.DbResults as List<Dictionary<string, object>>;
+
+
+                <div class="result-header">
+                    <div class="result-title-section">
+                        <div class="result-icon">📊</div>
+                        <div class="result-title">Query Results</div>
+                    </div>
+                    @if (results != null && results.Any())
+                    {
+                        <div class="result-stats">
+                            <span class="stat-item">📝 @results.Count @(results.Count == 1 ? "row" : "rows")</span>
+                            <span class="stat-item">📋 @results.First().Keys.Count @(results.First().Keys.Count == 1 ? "column" : "columns")</span>
+                        </div>
+                    }
+                </div>
+
+                <div class="data-table-container">
+                    @if (results != null && results.Any())
+                    {
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    @foreach (var columnKey in results.First().Keys)
+                                    {
+                                        <th>@FormatColumnHeader(columnKey)</th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var row in results)
+                                {
+                                    <tr>
+                                        @foreach (var columnKey in row.Keys)
+                                        {
+
+                                            var cellValue = row[columnKey];
+                                            var cellClass = GetCellClass(cellValue);
+                                            var displayValue = FormatCellValue(cellValue);
+
+                                            <td class="@cellClass">@Html.Raw(displayValue)</td>
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <div class="no-data">
+                            <p>🔍 No results found for your query.</p>
+                            <p>Try adjusting your search terms or ask a different question.</p>
+                        </div>
+                    }
+                </div>
+            }
         </div>
     }
 </div>
-    <H1>
-    @Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.DbResults)
-    </H1>
 
 <script>
     document.getElementById('searchForm').addEventListener('submit', function() {
@@ -308,9 +530,9 @@
             top: 100vh;
             animation: float-up 8s linear forwards;
         `;
-        
+
         document.body.appendChild(particle);
-        
+
         setTimeout(() => {
             particle.remove();
         }, 8000);
@@ -331,3 +553,108 @@
     `;
     document.head.appendChild(style);
 </script>
+
+@functions {
+
+    private string FormatColumnHeader(string columnName)
+    {
+        if (string.IsNullOrEmpty(columnName))
+            return columnName;
+
+        // Split camelCase and PascalCase words
+        var result = System.Text.RegularExpressions.Regex.Replace(columnName, "([a-z])([A-Z])", "$1 $2");
+
+
+
+        // Split by common separators
+
+        result = result.Replace("_", " ").Replace("-", " ");
+
+        // Capitalize first letter of each word
+        var words = result.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        for (int i = 0; i < words.Length; i++)
+        {
+            if (words[i].Length > 0)
+            {
+                words[i] = char.ToUpper(words[i][0]) + (words[i].Length > 1 ? words[i].Substring(1).ToLower() : "");
+            }
+        }
+
+        return string.Join(" ", words);
+    }
+
+    private string GetCellClass(object value)
+    {
+        if (value == null || value == DBNull.Value)
+            return "null-cell";
+
+        var valueType = value.GetType();
+
+        // Check for numeric types
+        if (valueType == typeof(int) || valueType == typeof(long) ||
+            valueType == typeof(decimal) || valueType == typeof(double) ||
+            valueType == typeof(float) || valueType == typeof(short))
+            return "numeric-cell";
+
+        // Check for boolean
+        if (valueType == typeof(bool))
+            return "boolean-cell";
+
+        // Check for URL in string
+        var stringValue = value.ToString();
+        if (stringValue != null && (stringValue.StartsWith("http://") || stringValue.StartsWith("https://")))
+            return "url-cell";
+
+        return "";
+    }
+
+    private string FormatCellValue(object value)
+    {
+        if (value == null || value == DBNull.Value)
+            return "null";
+
+        var valueType = value.GetType();
+
+        // Handle boolean values
+        if (valueType == typeof(bool))
+        {
+            bool boolValue = (bool)value;
+            return boolValue ?
+                "<span style='color: var(--neon-green);'>✓ True</span>" :
+                "<span style='color: #ff6b6b;'>✗ False</span>";
+        }
+
+        // Handle URL values
+        var stringValue = value.ToString();
+        if (stringValue != null && (stringValue.StartsWith("http://") || stringValue.StartsWith("https://")))
+        {
+            var displayText = stringValue.Length > 50 ? stringValue.Substring(0, 47) + "..." : stringValue;
+            return $"<a href='{stringValue}' target='_blank' title='{stringValue}'>{System.Web.HttpUtility.HtmlEncode(displayText)}</a>";
+        }
+
+        // Handle decimal/currency formatting
+        if (valueType == typeof(decimal))
+        {
+            var decimalValue = (decimal)value;
+            // If the value appears to be currency (has decimal places and reasonable range)
+            if (decimalValue > 0 && decimalValue < 1000000)
+                return $"${decimalValue:N2}";
+            return decimalValue.ToString("N2");
+        }
+
+        if (valueType == typeof(double) || valueType == typeof(float))
+        {
+            var doubleValue = Convert.ToDouble(value);
+            return doubleValue.ToString("N2");
+        }
+
+        // Handle integer formatting
+        if (valueType == typeof(int) || valueType == typeof(long) || valueType == typeof(short))
+        {
+            return value.ToString();
+        }
+
+        // Default string handling with HTML encoding
+        return System.Web.HttpUtility.HtmlEncode(stringValue ?? "");
+    }
+}
